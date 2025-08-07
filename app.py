@@ -16,21 +16,17 @@ def extract_seo_data_from_html_content(html_content):
     soup = BeautifulSoup(html_content, "html.parser")
     content_text = soup.get_text(separator=" ", strip=True)
 
-    try:
-        prompt_tags = f"""
+    prompt_tags = f"""
 Voici un contenu : "{content_text}"
 Donne-moi une liste de mots-clés (tags) pertinents, séparés par des virgules, sans phrases.
 """
-        tags_text = model.generate_content(prompt_tags).text.strip()
+    tags_text = model.generate_content(prompt_tags).text.strip()
 
-        prompt_desc = f"""
+    prompt_desc = f"""
 Voici un contenu : "{content_text}"
 Génère une description courte, accrocheuse et optimisée pour le référencement, en 150 caractères maximum.
 """
-        description_text = model.generate_content(prompt_desc).text.strip()
-    except Exception as e:
-        tags_text = "Erreur API"
-        description_text = "Erreur API"
+    description_text = model.generate_content(prompt_desc).text.strip()
 
     return tags_text, description_text
 
