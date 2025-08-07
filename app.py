@@ -3,9 +3,8 @@ from flask import Flask, render_template, request
 from bs4 import BeautifulSoup
 import google.generativeai as genai
 
-# Récupérer la clé API depuis la variable d'environnement
-API_KEY = "AIzaSyCsW9Dw7RKzI8fwn1VIuroksc-_biFi2Sw"
-API_KEY1 = os.environ.get("API_KEY")
+# Récupérer la clé API depuis la variable d'environnement ou la fixer ici
+API_KEY = os.environ.get("API_KEY") or "AIzaSyCsW9Dw7RKzI8fwn1VIuroksc-_biFi2Sw"
 
 genai.configure(api_key=API_KEY)
 model = genai.GenerativeModel("models/gemini-1.5-flash")
@@ -42,8 +41,9 @@ def index():
                 html_content = file.read().decode("utf-8")
                 tags, description = extract_seo_data_from_html_content(html_content)
             except Exception as e:
-                tags = "Erreur lors de la lecture du fichier"
-                description = "Erreur lors de la lecture du fichier"
+                error_message = f"Erreur : {str(e)}"
+                tags = error_message
+                description = error_message
 
     return render_template("index.html", tags=tags, description=description)
 
