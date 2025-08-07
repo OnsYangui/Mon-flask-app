@@ -4,9 +4,7 @@ from bs4 import BeautifulSoup
 import google.generativeai as genai
 
 # Récupérer la clé API depuis la variable d'environnement
-API_KEY = os.environ.get("API_KEY = "AIzaSyCsW9Dw7RKzI8fwn1VIuroksc-_biFi2Sw"")
-if not API_KEY:
-    raise Exception("La variable d'environnement GOOGLE_API_KEY n'est pas définie")
+API_KEY = os.environ.get("API_KEY")
 
 genai.configure(api_key=API_KEY)
 model = genai.GenerativeModel("models/gemini-1.5-flash")
@@ -19,15 +17,15 @@ def extract_seo_data_from_html_content(html_content):
 
     try:
         prompt_tags = f"""
-        Voici un contenu : "{content_text}"
-        Donne-moi une liste de mots-clés (tags) pertinents, séparés par des virgules, sans phrases.
-        """
+Voici un contenu : "{content_text}"
+Donne-moi une liste de mots-clés (tags) pertinents, séparés par des virgules, sans phrases.
+"""
         tags_text = model.generate_content(prompt_tags).text.strip()
 
         prompt_desc = f"""
-        Voici un contenu : "{content_text}"
-        Génère une description courte, accrocheuse et optimisée pour le référencement, en 150 caractères maximum.
-        """
+Voici un contenu : "{content_text}"
+Génère une description courte, accrocheuse et optimisée pour le référencement, en 150 caractères maximum.
+"""
         description_text = model.generate_content(prompt_desc).text.strip()
     except Exception as e:
         tags_text = "Erreur API"
@@ -43,10 +41,14 @@ def index():
     if request.method == "POST":
         file = request.files.get("htmlfile")
         if file and file.filename != "":
-            html_content = file.read().decode("utf-8")
-            tags, description = extract_seo_data_from_html_content(html_content)
+            try:
+                html_content = file.read().decode("utf-8")
+                tags, description = extract_seo_data_from_html_content(html_content)
+            except Exception as e:
+                tags = "Erreur lors de la lecture du fichier"
+                description = "Erreur lors de la lecture du fichier"
 
     return render_template("index.html", tags=tags, description=description)
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=True)
