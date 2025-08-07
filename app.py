@@ -16,21 +16,15 @@ def extract_seo_data_from_html_content(html_content):
     soup = BeautifulSoup(html_content, "html.parser")
     content_text = soup.get_text(separator=" ", strip=True)
 
-    try:
-        prompt_tags = f"""
-Voici un contenu : "{content_text}"
-Donne-moi une liste de mots-clés (tags) pertinents, séparés par des virgules, sans phrases.
-"""
-        tags_text = model.generate_content(prompt_tags).text.strip()
+    prompt_tags = f""" Voici un contenu : "{content_text}"
+    Donne-moi une liste de mots-clés (tags) pertinents, séparés par des virgules, sans phrases.
+    """
+    tags_text = model.generate_content(prompt_tags).text.strip()
 
-        prompt_desc = f"""
-Voici un contenu : "{content_text}"
-Génère une description courte, accrocheuse et optimisée pour le référencement, en 150 caractères maximum.
-"""
-        description_text = model.generate_content(prompt_desc).text.strip()
-    except Exception as e:
-        tags_text = "Erreur API"
-        description_text = "Erreur API"
+    prompt_desc = f""" Voici un contenu : "{content_text}"
+    Génère une description courte, accrocheuse et optimisée pour le référencement, en 150 caractères maximum.
+    """
+    description_text = model.generate_content(prompt_desc).text.strip()
 
     return tags_text, description_text
 
@@ -42,12 +36,8 @@ def index():
     if request.method == "POST":
         file = request.files.get("htmlfile")
         if file and file.filename != "":
-            try:
-                html_content = file.read().decode("utf-8")
-                tags, description = extract_seo_data_from_html_content(html_content)
-            except Exception as e:
-                tags = "Erreur lors de la lecture du fichier"
-                description = "Erreur lors de la lecture du fichier"
+            html_content = file.read().decode("utf-8")
+            tags, description = extract_seo_data_from_html_content(html_content)
 
     return render_template("index.html", tags=tags, description=description)
 
