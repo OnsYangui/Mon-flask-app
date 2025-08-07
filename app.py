@@ -3,7 +3,11 @@ from flask import Flask, render_template, request
 from bs4 import BeautifulSoup
 import google.generativeai as genai
 
-API_KEY = "AIzaSyCsW9Dw7RKzI8fwn1VIuroksc-_biFi2Sw"
+# Récupérer la clé API depuis la variable d'environnement
+API_KEY = os.environ.get("API_KEY = "AIzaSyCsW9Dw7RKzI8fwn1VIuroksc-_biFi2Sw"")
+if not API_KEY:
+    raise Exception("La variable d'environnement GOOGLE_API_KEY n'est pas définie")
+
 genai.configure(api_key=API_KEY)
 model = genai.GenerativeModel("models/gemini-1.5-flash")
 
@@ -13,17 +17,21 @@ def extract_seo_data_from_html_content(html_content):
     soup = BeautifulSoup(html_content, "html.parser")
     content_text = soup.get_text(separator=" ", strip=True)
 
-    prompt_tags = f"""
-    Voici un contenu : "{content_text}"
-    Donne-moi une liste de mots-clés (tags) pertinents, séparés par des virgules, sans phrases.
-    """
-    tags_text = model.generate_content(prompt_tags).text.strip()
+    try:
+        prompt_tags = f"""
+        Voici un contenu : "{content_text}"
+        Donne-moi une liste de mots-clés (tags) pertinents, séparés par des virgules, sans phrases.
+        """
+        tags_text = model.generate_content(prompt_tags).text.strip()
 
-    prompt_desc = f"""
-    Voici un contenu : "{content_text}"
-    Génère une description courte, accrocheuse et optimisée pour le référencement, en 150 caractères maximum.
-    """
-    description_text = model.generate_content(prompt_desc).text.strip()
+        prompt_desc = f"""
+        Voici un contenu : "{content_text}"
+        Génère une description courte, accrocheuse et optimisée pour le référencement, en 150 caractères maximum.
+        """
+        description_text = model.generate_content(prompt_desc).text.strip()
+    except Exception as e:
+        tags_text = "Erreur API"
+        description_text = "Erreur API"
 
     return tags_text, description_text
 
