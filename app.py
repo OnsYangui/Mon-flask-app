@@ -4,7 +4,8 @@ from bs4 import BeautifulSoup
 import google.generativeai as genai
 
 # Récupérer la clé API depuis la variable d'environnement
-API_KEY = os.environ.get("API_KEY")
+API_KEY = "AIzaSyCsW9Dw7RKzI8fwn1VIuroksc-_biFi2Sw"
+API_KEY1 = os.environ.get("API_KEY")
 
 genai.configure(api_key=API_KEY)
 model = genai.GenerativeModel("models/gemini-1.5-flash")
